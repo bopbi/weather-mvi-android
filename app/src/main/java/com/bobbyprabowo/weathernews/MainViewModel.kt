@@ -133,6 +133,8 @@ class MainViewModel @Inject constructor(
         intents.subscribe(intentsSubject)
     }
 
+    fun effects(): Observable<MainViewEffect> = effectsSubject
+
     fun states(): Observable<MainViewState> = statesObservable
 
     private fun compose(): Observable<MainViewState> {

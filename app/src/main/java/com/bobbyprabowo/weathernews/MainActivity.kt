@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider
-import autodispose2.androidx.lifecycle.autoDispose
 import autodispose2.autoDispose
+import com.bobbyprabowo.weathernews.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -21,16 +21,29 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        viewModel.effects()
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .autoDispose(scopeProvider)
+            .subscribe({
+                renderEffect(it)
+            }, {
+
+            })
 
         viewModel.states()
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .autoDispose(scopeProvider)
             .subscribe({
-                render(it)
+                renderState(it)
             }, {
 
             })
@@ -41,7 +54,14 @@ class MainActivity : AppCompatActivity() {
         ))
     }
 
-    private fun render(viewState: MainViewModel.MainViewState) {
-        Toast.makeText(this, viewState.weathers.toString(), Toast.LENGTH_LONG).show()
+    private fun renderEffect(viewEffect: MainViewModel.MainViewEffect) {
+        when (viewEffect) {
+            MainViewModel.MainViewEffect.Hurray -> Toast.makeText(this, "Hurray", Toast.LENGTH_LONG).show()
+            MainViewModel.MainViewEffect.Sad -> Toast.makeText(this, "SAD", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun renderState(viewState: MainViewModel.MainViewState) {
+        binding.jsonTextView.text = viewState.weathers.toString()
     }
 }
