@@ -5,8 +5,10 @@ import com.bobbyprabowo.weathernews.domain.FetchWeather
 import com.bobbyprabowo.weathernews.domain.LoadWeather
 import com.bobbyprabowo.weathernews.model.Weather
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableTransformer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import javax.inject.Inject
 
@@ -104,7 +106,10 @@ class MainViewModel @Inject constructor(
                     }
                     .cast(MainResult.FetchResult::class.java)
                     .toObservable()
+                    .onErrorReturn(MainResult.FetchResult::Fail)
                     .startWithItem(MainResult.FetchResult.Loading)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
             }
         }
 
@@ -117,9 +122,16 @@ class MainViewModel @Inject constructor(
                     }
                     .cast(MainResult.LoadResult::class.java)
                     .toObservable()
+                    .onErrorReturn(MainResult.LoadResult::Fail)
                     .startWithItem(MainResult.LoadResult.Loading)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
             }
         }
+
+    fun processIntents(intents: Observable<MainIntent>) {
+        intents.subscribe(intentsSubject)
+    }
 
     fun states(): Observable<MainViewState> = statesObservable
 

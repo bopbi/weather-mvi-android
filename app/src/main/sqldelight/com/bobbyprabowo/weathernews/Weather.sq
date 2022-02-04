@@ -1,0 +1,15 @@
+CREATE TABLE weather (
+  weather_state_name TEXT NOT NULL,
+  predictability INTEGER NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM weather;
+
+insert:
+INSERT INTO weather(weather_state_name, predictability)
+VALUES (?, ?);
+
+deleteAll:
+DELETE FROM weather;
