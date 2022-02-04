@@ -62,6 +62,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderState(viewState: MainViewModel.MainViewState) {
+        binding.statusTextView.text = if (viewState.isLoading) {
+            "Loading"
+        } else {
+            ""
+        }
         binding.jsonTextView.text = viewState.weathers.toString()
     }
 }

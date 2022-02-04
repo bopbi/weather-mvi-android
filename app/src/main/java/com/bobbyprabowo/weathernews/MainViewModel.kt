@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -104,6 +105,7 @@ class MainViewModel @Inject constructor(
                     .map { weathers ->
                         MainResult.FetchResult.Success(weathers = weathers)
                     }
+                    .delay(2000, TimeUnit.MILLISECONDS)
                     .cast(MainResult.FetchResult::class.java)
                     .toObservable()
                     .onErrorReturn(MainResult.FetchResult::Fail)
@@ -163,10 +165,12 @@ class MainViewModel @Inject constructor(
                 if (!currentState.isInitialLoad) {
                     currentState.copy(
                         isInitialLoad = false,
+                        isLoading = false,
                         isError = true,
                     )
                 } else {
                     currentState.copy(
+                        isLoading = false,
                         isError = true,
                     )
                 }
@@ -174,7 +178,7 @@ class MainViewModel @Inject constructor(
             }
             is MainResult.FetchResult.Loading -> {
                 currentState.copy(
-                    isLoading = false
+                    isLoading = true
                 )
             }
             is MainResult.FetchResult.Success -> {
@@ -192,8 +196,6 @@ class MainViewModel @Inject constructor(
             }
             is MainResult.LoadResult.Success -> {
                 currentState.copy(
-                    isLoading = false,
-                    isError = false,
                     weathers = result.weathers
                 )
             }
