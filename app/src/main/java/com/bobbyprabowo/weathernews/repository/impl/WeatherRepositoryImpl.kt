@@ -5,16 +5,22 @@ import com.bobbyprabowo.weathernews.model.Weather
 import com.bobbyprabowo.weathernews.model.dto.WeatherRequest
 import com.bobbyprabowo.weathernews.remote.WeatherService
 import com.bobbyprabowo.weathernews.repository.WeatherRepository
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
 class WeatherRepositoryImpl(private val weatherService: WeatherService, private val weatherQueries: WeatherQueries) : WeatherRepository {
-    override fun fetchWeather(weatherRequest: WeatherRequest): Single<List<Weather>> {
+
+    override fun fetchOnlyWeather(weatherRequest: WeatherRequest): Completable {
         return weatherService.fetchWeathers(weatherRequest).doOnSuccess { weatherResponses ->
             weatherQueries.deleteAll()
-            weatherResponses.forEach { weatherResponse ->
+            weatherResponses.distinct().forEach { weatherResponse ->
                 weatherQueries.insert(weatherResponse.weatherStateName, weatherResponse.predictability.toLong())
             }
-        }.ignoreElement().andThen(
+        }.ignoreElement()
+    }
+
+    override fun fetchWeather(weatherRequest: WeatherRequest): Single<List<Weather>> {
+        return fetchOnlyWeather(weatherRequest).andThen(
             getWeather()
         )
     }
