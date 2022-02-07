@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         ))
 
         binding.refreshButton.setOnClickListener {
+            logClick()
             interactionSubject.onNext(MainViewModel.MainIntent.RefreshIntent)
         }
     }
