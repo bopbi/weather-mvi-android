@@ -4,11 +4,14 @@ import com.bobbyprabowo.weathernews.domain.FetchWeather
 import com.bobbyprabowo.weathernews.domain.LoadWeather
 import com.bobbyprabowo.weathernews.domain.LogClick
 import com.bobbyprabowo.weathernews.domain.LogLastDataDisplayed
+import com.bobbyprabowo.weathernews.domain.SyncData
 import com.bobbyprabowo.weathernews.domain.impl.FetchWeatherImpl
 import com.bobbyprabowo.weathernews.domain.impl.LoadWeatherImpl
 import com.bobbyprabowo.weathernews.domain.impl.LogClickImpl
 import com.bobbyprabowo.weathernews.domain.impl.LogLastDataDisplayedImpl
+import com.bobbyprabowo.weathernews.domain.impl.SyncDataImpl
 import com.bobbyprabowo.weathernews.repository.AnalyticsRepository
+import com.bobbyprabowo.weathernews.repository.ProfileRepository
 import com.bobbyprabowo.weathernews.repository.WeatherRepository
 import dagger.Module
 import dagger.Provides
@@ -42,5 +45,11 @@ object DomainModule {
     @Provides
     fun provideLogLastDataDisplayed(analyticsRepository: AnalyticsRepository): LogLastDataDisplayed {
         return LogLastDataDisplayedImpl(analyticsRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSyncData(weatherRepository: WeatherRepository, profileRepository: ProfileRepository): SyncData {
+        return SyncDataImpl(weatherRepository, profileRepository)
     }
 }
